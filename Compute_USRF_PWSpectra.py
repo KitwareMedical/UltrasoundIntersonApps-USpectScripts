@@ -1,6 +1,8 @@
 __author__ = 'hyunjaekang'
 
 import sys
+sys.path.append('/home/ubuntu/src/ITK-Release/Wrapping/Generators/Python')
+sys.path.append('/home/ubuntu/src/ITK-Release/lib')
 import os
 import itk
 import numpy as np
@@ -94,7 +96,6 @@ def USRF_PWR_Spectra(input_rf_file_path, N1DFFT, SideLine, bSaveITKVector = 0, t
     extract_region.SetIndex(extract_Index)
     Extractor.SetExtractionRegion(extract_region)
     Extractor.UpdateLargestPossibleRegion()
-
     extracted_2D         = Extractor.GetOutput()
 
     #############
@@ -118,7 +119,7 @@ def USRF_PWR_Spectra(input_rf_file_path, N1DFFT, SideLine, bSaveITKVector = 0, t
 
     Spectra_Filter.SetInput(Extractor.GetOutput())
     Spectra_Filter.SetSupportWindowImage(Spectra_window_filter.GetOutput())
-    Spectra_Filter.UpdateLargestPossibleRegion()
+    Spectra_Filter.UpdateLargestPossibleRegion() # crashes for i_N1DFFT=128 and i_SideLine=16
 
     ## Todo: Save the following data with frame 0
     spectra_Image = Spectra_Filter.GetOutput()
@@ -208,8 +209,8 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         print 'input 2'
         input_rf_file_path = sys.argv[1]
-        N1DFFT_R = [8,16,32,64,128]
-        SideLine_R = [1,2,4,8,16,32]
+        N1DFFT_R = [32,64]
+        SideLine_R = [2]
         for nsfft  in N1DFFT_R:
             for szline in SideLine_R:
                 print "N1DFFT: %d, SideLine: %d" %(nsfft,szline)
@@ -219,8 +220,8 @@ if __name__ == '__main__':
         input_rf_file_path = sys.argv[1]
         Target_frame       = int(sys.argv[2])
         print "Target_frame: ",Target_frame
-        N1DFFT_R = [32,64,128]#[8,16,32,64,128]
-        SideLine_R = [1,2,4,8,16,32]
+        N1DFFT_R = [32,64]#[8,16,32,64,128]
+        SideLine_R = [2]#[1,2,4,8,16,32]
         for nsfft  in N1DFFT_R:
             for szline in SideLine_R:
                 print "N1DFFT: %d, SideLine: %d" %(nsfft,szline)
