@@ -1,4 +1,4 @@
-__author__ = 'hyunjaekang'
+#!/usr/bin/python
 
 import sys
 sys.path.append('/home/ubuntu/src/ITK-Release/Wrapping/Generators/Python')
@@ -17,7 +17,7 @@ def GetFileDirNameExt(file_Path):
     file_name, file_ext = os.path.splitext(splt_t)
     return file_dir, file_name, file_ext
 
-def Analyze_USRF_PWSpectra(target_pw_file, base_pw_file):
+def Analyze_USRF_PWSpectra_File(target_pw_file, base_pw_file):
     T_Dir, T_FileName, T_FileExt = GetFileDirNameExt(target_pw_file)
 
     TargetDir = T_Dir+'/Features/'
@@ -48,7 +48,7 @@ def Analyze_USRF_PWSpectra(target_pw_file, base_pw_file):
     log_file.write("%s \n" % base_pw_file)
     log_file.write("base pw position (col, row):\n")
     log_file.write("%d, %d \n" % (tar_col, tar_row))
-    log_file.write("windos index (win1, win2)\n")
+    log_file.write("window index (win1, win2)\n")
     log_file.write("%d, %d \n" % (win_1, win_2))
     log_file.close()
     
@@ -219,40 +219,39 @@ def Analyze_USRF_PWSpectra(target_pw_file, base_pw_file):
     FileWriter3D.Update()
 
 
-def Pre_Analyze_USRF_PWSpectra(root_target_rf_file, root_base_rf_file):
+def Analyze_USRF_PWSpectra(root_target_rf_file, B_file_dir):
 
     T_file_dir, T_file_name, T_file_ext = GetFileDirNameExt(root_target_rf_file)
     T_PWSpect_Dir = T_file_dir +'/RF_PWSpectra/'
 
-    B_file_dir, B_file_name, B_file_ext = GetFileDirNameExt(root_base_rf_file)
-    B_PWSpect_Dir = B_file_dir +'/'
-
     N1DFFT_R = [32,64]
     SideLine_R = [2]
 
-    for nsfft  in N1DFFT_R:
+    for nsfft in N1DFFT_R:
         for szline in SideLine_R:
             # Target File
-            Target_Dir = T_PWSpect_Dir + 'SLine_%03d' %szline + \
-                '_NFFT_%03d/' %nsfft
-            Target_File = T_file_name +'_SLine_%03d' %szline + \
-                '_NFFT_%03d' %nsfft +'_Avg.npy'
+            Target_Dir = T_PWSpect_Dir + '%03dSLine' %szline + \
+                '-%03dNFFT/' %nsfft
+            Target_File = T_file_name +'-%03dSLine' %szline + \
+                '-%03dNFFT' %nsfft +'-Avg.npy'
             Target_FilePath = Target_Dir+Target_File
             print "Target file = ", Target_FilePath
 
+            freqPosStart = T_file_name.find("MHz")-3
+            freq = T_file_name[freqPosStart:freqPosStart+3]
+ 
             # BaseLine File
-            Base_Dir = B_PWSpect_Dir 
-            Base_File = B_file_name +'_SLine_%03d' %szline + \
-                '_NFFT_%03d' %nsfft +'_Avg_BL.npy'
-            Base_FilePath   = Base_Dir+Base_File
-            print "Baseline file - ", Base_FilePath
-
-            Analyze_USRF_PWSpectra(Target_FilePath, Base_FilePath)
-
+            Base_File = 'BaseLine-P1-'+freq+'MHz-%03dSLine' %szline + \
+                '-%03dNFFT' %nsfft +'-Avg-BL.npy'
+            Base_FilePath   = B_file_dir+'/'+Base_File
+            print "Baseline file = ", Base_FilePath
+ 
+            Analyze_USRF_PWSpectra_File(Target_FilePath, Base_FilePath)
 
 if __name__ == '__main__':
     if len(sys.argv) == 3:
-        print 'input 3'
         root_target_rf_file = sys.argv[1]
         root_base_rf_file = sys.argv[2]
-        Pre_Analyze_USRF_PWSpectra(root_target_rf_file, root_base_rf_file)
+        Analyze_USRF_PWSpectra(root_target_rf_file, root_base_rf_file)
+    else:
+        print 'Analyze_USRF_PWSpectra <target> <basefile>'

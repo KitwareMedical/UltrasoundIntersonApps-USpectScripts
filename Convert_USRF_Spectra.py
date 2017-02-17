@@ -1,15 +1,16 @@
-__author__ = 'hyunjaekang'
+#!/usr/bin/python
 
 import sys
 sys.path.append('/home/ubuntu/src/ITK-Release/Wrapping/Generators/Python')
 sys.path.append('/home/ubuntu/src/ITK-Release/lib')
+
 import os
 import itk
 import numpy as np
 
-def USRF_PWR_Spectra(input_rf_file_path, N1DFFT, SideLine, bSaveITKVector = 0, targetframe = 9999):
+def Convert_USRF_Spectra_File(input_rf_file_path, N1DFFT, side_line, targetframe=9999, save_ITK_vector=0):
 
-    i_SideLine = int(SideLine)
+    i_side_line = int(side_line)
     i_N1DFFT   = int(N1DFFT)
     b_Target   = False
 
@@ -18,33 +19,30 @@ def USRF_PWR_Spectra(input_rf_file_path, N1DFFT, SideLine, bSaveITKVector = 0, t
         b_Target = True
         print "b_Target: ", b_Target
 
-    # i_SideLine = SideLine
-    # i_N1DFFT   = N1DFFT
-
     file_dir, splt_t = os.path.split(input_rf_file_path)
     file_name, file_ext = os.path.splitext(splt_t)
 
     ###############
-    Out_Dir = file_dir +'/RF_PWSpectra/'
-    if not os.path.exists(Out_Dir):
+    out_dir = file_dir +'/RF_PWSpectra/'
+    if not os.path.exists(out_dir):
         print 'Create Dir'
-        os.makedirs(Out_Dir)
+        os.makedirs(out_dir)
 
-    Out_Dir = Out_Dir + 'SLine_%03d' %i_SideLine +'_NFFT_%03d/' %i_N1DFFT
-    if not os.path.exists(Out_Dir):
+    out_dir = out_dir + '%03dSLine' %i_side_line +'-%03dNFFT/' %i_N1DFFT
+    if not os.path.exists(out_dir):
         print 'Create Dir'
-        os.makedirs(Out_Dir)
+        os.makedirs(out_dir)
 
 
-    print "File_Dir:",file_dir
-    print "File_Name:",file_name
-    print "File_Ext:",file_ext
+    print "File_Dir:",  file_dir
+    print "File_Name:", file_name
+    print "File_Ext:",  file_ext
 
-    print "Out_Dir: ", Out_Dir
-    print "N1DFFT: ", N1DFFT
-    print "SideLine: ", SideLine
+    print "Out_Dir: ",  out_dir
+    print "N1DFFT: ",   N1DFFT
+    print "SideLine: ", side_line
 
-    new_file_name_prefix = file_name +'_SLine_%03d' %i_SideLine +'_NFFT_%03d' %i_N1DFFT
+    new_file_name_prefix = file_name +'-%03dSLine' %i_side_line +'-%03dNFFT' %i_N1DFFT
     print "new_file_name_prefix: ", new_file_name_prefix
 
     ##############################
@@ -104,7 +102,7 @@ def USRF_PWR_Spectra(input_rf_file_path, N1DFFT, SideLine, bSaveITKVector = 0, t
     side_lines.CopyInformation(extracted_2D)#(us_rf3D)
     side_lines.SetRegions(extracted_2D.GetLargestPossibleRegion())
     side_lines.Allocate()
-    side_lines.FillBuffer(i_SideLine)
+    side_lines.FillBuffer(i_side_line)
 
     Spectra_window_filter = itk.Spectra1DSupportWindowImageFilter[uchar_2D_ImageType].New()
     Spectra_window_filter.SetInput(side_lines)
@@ -119,15 +117,15 @@ def USRF_PWR_Spectra(input_rf_file_path, N1DFFT, SideLine, bSaveITKVector = 0, t
 
     Spectra_Filter.SetInput(Extractor.GetOutput())
     Spectra_Filter.SetSupportWindowImage(Spectra_window_filter.GetOutput())
-    Spectra_Filter.UpdateLargestPossibleRegion() # crashes for i_N1DFFT=128 and i_SideLine=16
+    Spectra_Filter.UpdateLargestPossibleRegion() 
 
     ## Todo: Save the following data with frame 0
     spectra_Image = Spectra_Filter.GetOutput()
 
-    Vec2D_Dir = Out_Dir+new_file_name_prefix+'_2D_ImgVectors/'
+    Vec2D_Dir = out_dir+new_file_name_prefix+'_2D_ImgVectors/'
     print "Vec2D_Dir : ", Vec2D_Dir
 
-    if bSaveITKVector > 0:
+    if save_ITK_vector > 0:
         if not os.path.exists(Vec2D_Dir):
             print 'Create Dir'
             os.makedirs(Vec2D_Dir)
@@ -137,8 +135,6 @@ def USRF_PWR_Spectra(input_rf_file_path, N1DFFT, SideLine, bSaveITKVector = 0, t
         ITKWriter_Spectra.SetInput(spectra_Image)
         ITKWriter_Spectra.SetFileName(Vec2D_Dir+Vec2D_Nam)
         ITKWriter_Spectra.Update()
-
-
 
     temp_spectra_Image_arr = itk.PyBuffer[rf_spectra_ImageType].GetArrayFromImage(spectra_Image)
     print "The shape of spectra_Image_arr", temp_spectra_Image_arr.shape
@@ -165,7 +161,7 @@ def USRF_PWR_Spectra(input_rf_file_path, N1DFFT, SideLine, bSaveITKVector = 0, t
         ## Todo: Save the following data with frame 0
         spectra_Image = Spectra_Filter.GetOutput()
 
-        if bSaveITKVector > 0:
+        if save_ITK_vector > 0:
             Vec2D_Nam = "frame_%05d.mha" % frame
             print "Vec2D_Nam : ", Vec2D_Nam
             ITKWriter_Spectra.SetInput(spectra_Image)
@@ -179,65 +175,47 @@ def USRF_PWR_Spectra(input_rf_file_path, N1DFFT, SideLine, bSaveITKVector = 0, t
         if b_Target == True:
             if targetframe == frame:
                 print "Targeted Frame: %d, current frame: %d" %(targetframe, frame)
-                FilePathFrame     = Out_Dir + new_file_name_prefix +'_frame_%05d.npy' % frame
+                FilePathFrame     = out_dir + new_file_name_prefix +'_frame_%05d.npy' % frame
                 np.save(FilePathFrame, temp_spectra_Image_arr)
 
                 Vec2D_Nam = new_file_name_prefix + "_2DVector_frame_%05d.mha" % frame
                 print "Vec2D_Nam : ", Vec2D_Nam
                 ITKWriter_Spectra.SetInput(spectra_Image)
-                ITKWriter_Spectra.SetFileName(Out_Dir+Vec2D_Nam)
+                ITKWriter_Spectra.SetFileName(out_dir+Vec2D_Nam)
                 ITKWriter_Spectra.Update()
 
 
     NPArr_3DRF_PWSpectra_Avg = sum_spectra_Image_arr / us_rf3D_frames
-    FilePath3DAvg  = Out_Dir + new_file_name_prefix +'_Avg.npy'
+    FilePath3DAvg  = out_dir + new_file_name_prefix +'-Avg.npy'
     np.save(FilePath3DAvg, NPArr_3DRF_PWSpectra_Avg)
 
     if b_Target == False:
-        FilePath3D     = Out_Dir + new_file_name_prefix +'.npy'
+        FilePath3D     = out_dir + new_file_name_prefix +'.npy'
         np.save(FilePath3D, NPArr_3DRF_PWSpectra)
 
 
-    print "Done: ", input_rf_file_path
-
-
-
-
-
+def Convert_USRF_Spectra(input_file, target_frame=9999, save_ITK_vector=0):
+    N1DFFT_R = [32,64]
+    side_line_R = [2]
+    for nsfft in N1DFFT_R:
+        for szline in side_line_R:
+            print "N1DFFT: %d, SideLine: %d" %(nsfft,szline)
+            Convert_USRF_Spectra_File(input_file, nsfft, szline,
+                target_frame, save_ITK_vector)
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
-        print 'input 2'
-        input_rf_file_path = sys.argv[1]
-        N1DFFT_R = [32,64]
-        SideLine_R = [2]
-        for nsfft  in N1DFFT_R:
-            for szline in SideLine_R:
-                print "N1DFFT: %d, SideLine: %d" %(nsfft,szline)
-                USRF_PWR_Spectra(input_rf_file_path, nsfft, szline)
+        input_file         = sys.argv[1]
+        Convert_USRF_Spectra(input_file)
     elif len(sys.argv) == 3:
-        print 'input 3'
-        input_rf_file_path = sys.argv[1]
-        Target_frame       = int(sys.argv[2])
-        print "Target_frame: ",Target_frame
-        N1DFFT_R = [32,64]#[8,16,32,64,128]
-        SideLine_R = [2]#[1,2,4,8,16,32]
-        for nsfft  in N1DFFT_R:
-            for szline in SideLine_R:
-                print "N1DFFT: %d, SideLine: %d" %(nsfft,szline)
-                USRF_PWR_Spectra(input_rf_file_path, nsfft, szline, targetframe= Target_frame)
+        input_file         = sys.argv[1]
+        target_frame       = int(sys.argv[2])
+        Convert_USRF_Spectra(input_file, target_frame)
     elif len(sys.argv) == 4:
-        print 'input 4'
-        input_rf_file_path = sys.argv[1]
-        N1DFFT             = sys.argv[2]
-        SideLine           = sys.argv[3]
-        USRF_PWR_Spectra(input_rf_file_path, N1DFFT, SideLine)
-    elif len(sys.argv) == 5:
-        print 'input 5'
-        input_rf_file_path = sys.argv[1]
-        N1DFFT             = sys.argv[2]
-        SideLine           = sys.argv[3]
-        bSaveITKVector     = sys.argv[4]
-        USRF_PWR_Spectra(input_rf_file_path, N1DFFT, SideLine,bSaveITKVector)
+        input_file         = sys.argv[1]
+        target_frame       = int(sys.argv[2])
+        save_ITK_vector    = sys.argv[3]
+        Convert_USRF_Spectra( input_rf_file_path, target_frame, 
+            save_ITK_vector )
     else:
-        print "ConvertRF2BMode inputFilepath outputFilePath"
+        print "Convert_USRF_Spectra <input_file> [target_frame [save_ITK_vector]]"
