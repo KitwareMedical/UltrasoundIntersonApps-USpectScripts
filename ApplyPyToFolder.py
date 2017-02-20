@@ -1,4 +1,4 @@
-#!/usr/bin/python
+''#!/usr/bin/python
 
 import sys
 import os
@@ -6,9 +6,9 @@ import imp
 import glob
 
 def ApplyPyToFolder(script, folder, script_arg=""):
-    print "Folder = ", folder
-    print "Script = ", script
-    print "Extra Arg = ", script_arg
+    print( "Folder = " + folder )
+    print( "Script = " + script )
+    print( "Extra Arg = " + script_arg )
 
     script_file_dir, script_file_name_ext = os.path.split(script)
     script_module_name, script_file_ext = os.path.splitext(script_file_name_ext)
@@ -18,9 +18,9 @@ def ApplyPyToFolder(script, folder, script_arg=""):
     file_list = glob.glob(folder+'/*.nrrd')
     i = 0
     number_of_files = len(file_list)
-    print "Number of files =", number_of_files
+    print( "Number of files = " + str( number_of_files ) )
     for input_file in file_list:
-        print "%d of %d: %s" %(i, number_of_files, input_file)
+        print( "%d of %d: %s" %(i, number_of_files, input_file) )
         if len(script_arg) == 0:
             script_class(input_file)
         else:
@@ -38,4 +38,4 @@ if __name__ == '__main__':
         script_arg = sys.argv[3]
         ApplyPyToFolder(script, folder, script_arg)
     else:
-        print "ApplyPyToFolder <script> <folder> [extra_script_arg]"
+        print( "ApplyPyToFolder <script> <folder> [extra_script_arg]")
