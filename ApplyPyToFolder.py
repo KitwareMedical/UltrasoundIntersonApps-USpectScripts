@@ -1,4 +1,4 @@
-''#!/usr/bin/python
+#!/usr/bin/python
 
 import sys
 import os
@@ -6,9 +6,9 @@ import imp
 import glob
 
 def ApplyPyToFolder(script, folder, script_arg=""):
-    print( "Folder = " + folder )
-    print( "Script = " + script )
-    print( "Extra Arg = " + script_arg )
+    print("Folder = " + folder)
+    print("Script = " + script)
+    print("Extra Arg = " + script_arg)
 
     script_file_dir, script_file_name_ext = os.path.split(script)
     script_module_name, script_file_ext = os.path.splitext(script_file_name_ext)
