@@ -16,15 +16,31 @@ def Convert_USRF_BMode(inputFilePath):
 
     ## Load RF data
     InputPixelType = itk.F
-    ImageType = itk.Image[InputPixelType, 2]
+    Dimension = 2
+    ImageType = itk.Image[InputPixelType, Dimension]
+    direction = 0
 
     reader = itk.ImageFileReader[ImageType].New()
     reader.SetFileName(inputFilePath)
 
+    # Remove low frequency artifacts on the Interson array probe
+    filterFunction = itk.ButterworthBandpass1DFilterFunction.New()
+    # < 2 MHz
+    filterFunction.SetLowerFrequency( 0.12 )
+    filterFunction.SetOrder( 7 )
+    ComplexPixelType = itk.complex[InputPixelType]
+    ComplexImageType = itk.Image[ComplexPixelType, Dimension]
+    frequencyFilter = itk.FrequencyDomain1DImageFilter[ComplexImageType,
+            ComplexImageType].New()
+    frequencyFilter.SetDirection(direction)
+    filterFunctionBase = itk.FrequencyDomain1DFilterFunction.New()
+    frequencyFilter.SetFilterFunction(filterFunctionBase.cast(filterFunction))
+
     ## Generate Pre-Scanconversion Data from the RF file
     bMode_Filter = itk.BModeImageFilter[ImageType, ImageType].New()
     bMode_Filter.SetInput(reader.GetOutput())
-    bMode_Filter.SetDirection(0)
+    bMode_Filter.SetDirection(direction)
+    bMode_Filter.SetFrequencyFilter(frequencyFilter)
     bMode_Filter.Update()
     bMode = bMode_Filter.GetOutput()
 
