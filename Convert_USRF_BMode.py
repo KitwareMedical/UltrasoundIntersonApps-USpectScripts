@@ -15,7 +15,7 @@ def Convert_USRF_BMode(inputFilePath):
         os.makedirs(Out_Dir)
 
     ## Load RF data
-    InputPixelType = itk.F
+    InputPixelType = itk.ctype('float')
     Dimension = 2
     ImageType = itk.Image[InputPixelType, Dimension]
     direction = 0
