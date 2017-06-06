@@ -3,7 +3,7 @@
 import sys
 import os
 import imp
-import glob
+import fnmatch
 
 def ApplyPyToFolder(script, folder, script_arg=""):
     print("Folder = " + folder)
@@ -15,7 +15,10 @@ def ApplyPyToFolder(script, folder, script_arg=""):
     script_module = imp.load_source(script_module_name, script)
     script_class = getattr(script_module, script_module_name)
 
-    file_list = glob.glob(os.path.join(folder, '*.nrrd'))
+    file_list = []
+    for root, dirnames, filenames in os.walk(folder):
+        for filename in fnmatch.filter(filenames, '*.nrrd'):
+            file_list.append(os.path.join(root, filename))
     number_of_files = len(file_list)
     print("Number of files = " + str(number_of_files))
     for i, input_file in enumerate(file_list):
