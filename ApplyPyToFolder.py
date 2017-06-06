@@ -15,17 +15,15 @@ def ApplyPyToFolder(script, folder, script_arg=""):
     script_module = imp.load_source(script_module_name, script)
     script_class = getattr(script_module, script_module_name)
 
-    file_list = glob.glob(folder+'/*.nrrd')
-    i = 0
+    file_list = glob.glob(os.path.join(folder, '*.nrrd'))
     number_of_files = len(file_list)
-    print( "Number of files = " + str( number_of_files ) )
-    for input_file in file_list:
-        print( "%d of %d: %s" %(i, number_of_files, input_file) )
+    print("Number of files = " + str(number_of_files))
+    for i, input_file in enumerate(file_list):
+        print("%d of %d: %s" %(i, number_of_files, input_file))
         if len(script_arg) == 0:
             script_class(input_file)
         else:
             script_class(input_file, script_arg)
-        i = i + 1
 
 if __name__ == '__main__':
     if len(sys.argv) == 3:
@@ -38,4 +36,4 @@ if __name__ == '__main__':
         script_arg = sys.argv[3]
         ApplyPyToFolder(script, folder, script_arg)
     else:
-        print( "ApplyPyToFolder <script> <folder> [extra_script_arg]")
+        print("ApplyPyToFolder <script> <folder> [extra_script_arg]")
