@@ -1,25 +1,21 @@
 #!/usr/bin/python
 
 import os
-import sys
 
 import itk
 
 import matplotlib.pyplot as plt
 from scipy import signal
 import numpy as np
+import argparse
 
-# Sampling frequency [Hz]
-fs = 30e3
-
-def VisualizeSpectra(rf_files):
+def VisualizeSpectra(rf_files, freq_sampling):
     plt.figure(1, figsize=(20, 16))
     for rf_file in rf_files:
         image = itk.imread(rf_file)
         arr = itk.GetArrayViewFromImage(image)
-        N = arr.shape[1]
         freq, Pxx = signal.periodogram(arr.transpose(),
-                fs,
+                freq_sampling,
                 window='hamming',
                 detrend='linear',
                 axis=0)
@@ -31,13 +27,14 @@ def VisualizeSpectra(rf_files):
 
     dirname = os.path.dirname(rf_files[0])
     plt.savefig(os.path.join(dirname, 'PowerSpectralDensity.png'), dpi=300)
-    # plt.show()
+    plt.show()
 
 
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        rf_files = sys.argv[1:]
-        VisualizeSpectra(rf_files)
-    else:
-        print("VisualizeSpectra [rf_file_1] [rf_file_2] [...]")
+    parser = argparse.ArgumentParser(description='Visualize Power Spectra.')
+    parser.add_argument('rf_files', metavar='N', nargs='+', help='rf data files')
+    parser.add_argument('--freq-sampling', type=float, default=30e3,
+        help='sampling frequency [Hz]')
+    args = parser.parse_args()
+    VisualizeSpectra(args.rf_files, args.freq_sampling)
