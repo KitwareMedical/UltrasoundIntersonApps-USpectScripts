@@ -29,6 +29,7 @@ def VisualizeReferenceSpectrum(rf_files, freq_sampling):
         plt.xlabel('Frequency [Hz]')
         plt.ylabel('Power spectral density')
     plt.figlegend(handles, labels, 'upper right')
+    plt.ylim(0.0, 1.0)
 
     dirname = os.path.dirname(rf_files[0])
     plt.savefig(os.path.join(dirname, 'ReferenceSpectrum.png'), dpi=300)
