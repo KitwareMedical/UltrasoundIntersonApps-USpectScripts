@@ -5,7 +5,6 @@ import os
 import itk
 
 import matplotlib.pyplot as plt
-from scipy import signal
 import numpy as np
 import argparse
 
@@ -21,13 +20,13 @@ def VisualizeReferenceSpectrum(rf_files, freq_sampling):
         reader.Update()
         image = reader.GetOutput()
         arr = itk.GetArrayFromImage(image)
-        arr /= arr[:,:,arr.shape[2]/10:].max()
+        arr /= arr[:,:,arr.shape[2]/3-arr.shape[2]/5:arr.shape[2]/2+arr.shape[2]/5].max()
         freq = np.linspace(freq_sampling / 2 / arr.shape[2], freq_sampling / 2, arr.shape[2])
         ax = plt.plot(freq, arr[0, 0, :].ravel(), label=rf_file)
         handles.append(ax[0])
         labels.append(rf_file)
         plt.xlabel('Frequency [Hz]')
-        plt.ylabel('Power spectral density')
+        plt.ylabel('Power spectrum [V]')
     plt.figlegend(handles, labels, 'upper right')
     plt.ylim(0.0, 1.0)
 
@@ -36,10 +35,9 @@ def VisualizeReferenceSpectrum(rf_files, freq_sampling):
     plt.show()
 
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Visualize Reference Power Spectrum.')
-    parser.add_argument('rf_files', metavar='N', nargs='+', help='rf data files')
+    parser.add_argument('rf_files', nargs='+', help='rf data files')
     parser.add_argument('--freq-sampling', type=float, default=30e3,
         help='sampling frequency [Hz]')
     args = parser.parse_args()

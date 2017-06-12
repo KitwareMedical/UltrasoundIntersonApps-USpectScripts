@@ -27,7 +27,7 @@ def VisualizePixelSpectrum(spectra_file, freq_sampling, index):
     plt.xlabel('Frequency [Hz]')
     plt.ylabel('Power spectral density')
     plt.figlegend(handles, labels, 'upper right')
-    # plt.ylim(0.0, 1.0)
+    plt.ylim(0.0, 2.0)
 
     dirname = os.path.dirname(spectra_file)
     # plt.savefig(os.path.join(dirname, 'PixelSpectrum.png'), dpi=300)

@@ -4,7 +4,7 @@ import sys
 import os
 import itk
 
-def Estimate_USRF_ReferenceSpectrum(input_filepath, side_lines, fft1D_size,
+def Estimate_USRF_ReferenceSpectrum(input_filepath, side_lines=5, fft1D_size=128,
         subregion_depth_fraction=1.0):
 
     InputPixelType = itk.ctype('float')
@@ -92,10 +92,10 @@ def Estimate_USRF_ReferenceSpectrum(input_filepath, side_lines, fft1D_size,
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         input_filepath = sys.argv[1]
-        side_lines = 1
+        side_lines = 5
         if len(sys.argv) > 2:
             side_lines = int(sys.argv[2])
-        fft1D_size = 32
+        fft1D_size = 128
         if len(sys.argv) > 3:
             fft1D_size = int(sys.argv[3])
         subregion_depth_fraction = 1.0
@@ -105,4 +105,5 @@ if __name__ == '__main__':
                 subregion_depth_fraction)
     else:
         print("Estimate_USRF_ReferenceSpectrum <input_filepath> [side_lines] [fft1D_size] [subregion_depth_fraction]")
+        sys.exit(1)
 

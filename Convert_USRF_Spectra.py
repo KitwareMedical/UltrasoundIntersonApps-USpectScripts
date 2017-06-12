@@ -1,14 +1,12 @@
 #!/usr/bin/python
 
 import sys
-sys.path.append('/home/ubuntu/src/ITK-Release/Wrapping/Generators/Python')
-sys.path.append('/home/ubuntu/src/ITK-Release/lib')
 
 import os
 import itk
 import numpy as np
 
-def Convert_USRF_Spectra_File(input_rf_file_path, N1DFFT, side_line, targetframe=9999, save_ITK_vector=0):
+def Convert_USRF_Spectra(input_rf_filepath, side_lines, fft1D_size):
 
     i_side_line = int(side_line)
     i_N1DFFT   = int(N1DFFT)
