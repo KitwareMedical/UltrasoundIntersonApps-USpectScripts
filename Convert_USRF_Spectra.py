@@ -89,6 +89,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Estimate local corrected spectrum.')
     parser.add_argument('rf_filepath', help='input rf filepath')
     parser.add_argument('reference_path', help='path to folder containing reference spectra relate to rf_filepath dirname')
-    parser.add_argument('--output-path', default='SpectraIteration1', help='subdirectory relate to rf_filepath dirname to write output spectra images')
+    parser.add_argument('--output-path', default='SpectraIteration1',
+            help='subdirectory relative to rf_filepath dirname to write output spectra images')
     args = parser.parse_args()
     Convert_USRF_Spectra(args.rf_filepath, args.reference_path, args.output_path)
