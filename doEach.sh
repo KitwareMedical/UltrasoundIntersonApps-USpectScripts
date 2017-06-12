@@ -35,7 +35,6 @@ LinearProbe1DataSets=(
   PC3/
   PC4/
   PC5/
-  PlanarReflector1/
   Pork1/
   Pork2/
   Pork3/
@@ -58,6 +57,26 @@ for dataset in ${LinearProbe1DataSets[@]}; do
     --glob "${glob}" \
     ${script_dir}/Convert_USRF_Spectra.py \
     ./LinearProbe1/${dataset} \
+    '../PlanarReflector1/ReferenceSpectrum/' \
+    'SpectraIteration1'
+  echo ''
+done
+
+LinearProbe2DataSets=(
+  Chicken1/
+  Chicken2/
+  CS1/
+  CS2/
+  Pork1/
+  Pork2/
+  Steak1/
+  Steak2/
+  )
+for dataset in ${LinearProbe2DataSets[@]}; do
+  python ${script_dir}/ApplyPyToFolder.py \
+    --glob "${glob}" \
+    ${script_dir}/Convert_USRF_Spectra.py \
+    ./LinearProbe2/${dataset} \
     '../PlanarReflector1/ReferenceSpectrum/' \
     'SpectraIteration1'
   echo ''
