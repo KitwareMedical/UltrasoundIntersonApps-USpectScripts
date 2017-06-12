@@ -52,15 +52,25 @@ LinearProbe1DataSets=(
   Steak3/
   Steak4/
   )
+#for dataset in ${LinearProbe1DataSets[@]}; do
+  #python ${script_dir}/ApplyPyToFolder.py \
+    #--glob "${glob}" \
+    #${script_dir}/Convert_USRF_Spectra.py \
+    #./LinearProbe1/${dataset} \
+    #'../PlanarReflector1/ReferenceSpectrum/' \
+    #'SpectraIteration1'
+  #echo ''
+#done
+
 for dataset in ${LinearProbe1DataSets[@]}; do
   python ${script_dir}/ApplyPyToFolder.py \
-    --glob "${glob}" \
-    ${script_dir}/Convert_USRF_Spectra.py \
-    ./LinearProbe1/${dataset} \
-    '../PlanarReflector1/ReferenceSpectrum/' \
-    'SpectraIteration1'
+    --glob "*Spectra*.mha" \
+    ${script_dir}/Analyze_USRF_Spectra.py \
+    ./LinearProbe1/${dataset}/SpectraIteration1/ \
+    '../SpectraIteration1Features'
   echo ''
 done
+
 
 LinearProbe2DataSets=(
   Chicken1/
@@ -72,12 +82,13 @@ LinearProbe2DataSets=(
   Steak1/
   Steak2/
   )
-for dataset in ${LinearProbe2DataSets[@]}; do
-  python ${script_dir}/ApplyPyToFolder.py \
-    --glob "${glob}" \
-    ${script_dir}/Convert_USRF_Spectra.py \
-    ./LinearProbe2/${dataset} \
-    '../PlanarReflector1/ReferenceSpectrum/' \
-    'SpectraIteration1'
-  echo ''
-done
+
+#for dataset in ${LinearProbe2DataSets[@]}; do
+  #python ${script_dir}/ApplyPyToFolder.py \
+    #--glob "${glob}" \
+    #${script_dir}/Convert_USRF_Spectra.py \
+    #./LinearProbe2/${dataset} \
+    #'../PlanarReflector1/ReferenceSpectrum/' \
+    #'SpectraIteration1'
+  #echo ''
+#done

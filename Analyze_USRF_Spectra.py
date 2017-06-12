@@ -102,7 +102,7 @@ def Analyze_USRF_Spectra(spectra_filepath, output_path, spectra_start_idx=4,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Compute features from the spectra image.')
     parser.add_argument('spectra_filepath', help='input spectra filepath')
-    parser.add_argument('--output-path', default='../SpectraIteration1Features',
+    parser.add_argument('output_path', default='../SpectraIteration1Features',
             help='subdirectory relative to spectra_filepath dirname to write output spectra feature images')
     args = parser.parse_args()
     Analyze_USRF_Spectra(args.spectra_filepath, args.output_path)
