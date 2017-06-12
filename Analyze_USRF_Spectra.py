@@ -53,6 +53,12 @@ def Analyze_USRF_Spectra(spectra_filepath, output_path, spectra_start_idx=4,
     line_num_features = 2
     line_image = np.zeros([num_lateral, num_axial, line_num_features], dtype=np.float32)
 
+    local_slope_points = 4
+    local_slope_num_features = spectra.shape[2] / local_slope_points
+    local_slope_image = np.zeros([num_lateral, num_axial, local_slope_num_features],
+            dtype=np.float32)
+
+
     legendre_num_features = 7
     legendre_image = np.zeros([num_lateral, num_axial, legendre_num_features], dtype=np.float32)
 
@@ -73,6 +79,12 @@ def Analyze_USRF_Spectra(spectra_filepath, output_path, spectra_start_idx=4,
             line_image[lateral, axial, 0] = line_coefs.slope
             line_image[lateral, axial, 1] = line_coefs.intercept
 
+            for ii in range(local_slope_num_features):
+                coefs = scipy.stats.linregress(
+                    np.arange(local_slope_points),
+                    spectrum[ii*local_slope_points:(ii+1)*local_slope_points])
+                local_slope_image[lateral, axial, ii] = coefs.slope
+
             legn_coefs = np.polynomial.legendre.legfit(
                 np.arange(len(spectrum)), spectrum, legendre_num_features-1)
             legendre_image[lateral, axial, :] = legn_coefs
@@ -82,6 +94,7 @@ def Analyze_USRF_Spectra(spectra_filepath, output_path, spectra_start_idx=4,
 
     save_output(chebyshev_image, '_Chebyshev')
     save_output(line_image, '_Line')
+    save_output(local_slope_image, '_LocalSlope')
     save_output(legendre_image, '_Legendre')
     save_output(integrated_image, '_Integrated')
 
