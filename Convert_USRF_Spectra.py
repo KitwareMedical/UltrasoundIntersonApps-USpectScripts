@@ -52,7 +52,7 @@ def Convert_USRF_Spectra(input_filepath, reference_path, output_path, side_lines
     reference_reader = itk.ImageFileReader[SpectraImageType].New()
     basename = os.path.splitext(os.path.basename(input_filepath))[0]
     reference_path = os.path.join(os.path.dirname(input_filepath), reference_path)
-    reference_glob = glob.glob(os.path.join(reference_path, basename[:-5] + '*.mha'))
+    reference_glob = glob.glob(os.path.join(reference_path, basename[:-11] + '*.mha'))
     if len(reference_glob) != 1:
         print('Reference spectra file not found')
         print('Found: ', reference_glob)
