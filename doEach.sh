@@ -10,11 +10,11 @@ script_dir=$(cd $(dirname $0) || exit 1; pwd)
 
 #python ./ApplyPyToFolder.py ./Convert_USRF_BMode.py ~/data/2017.05.31-FourProbes-PlanarNormalization-Meat-Liver/
 
-python ${script_dir}/ApplyPyToFolder.py \
-  --glob '*[12][05]_freq_000[75][05]00000_*.nrrd' \
-  ${script_dir}/Estimate_USRF_ReferenceSpectrum.py \
-  ./LinearProbe1/PlanarReflector1
-python ${script_dir}/ApplyPyToFolder.py \
-  --glob '*[12][05]_freq_000[75][05]00000_*.nrrd' \
-  ${script_dir}/Estimate_USRF_ReferenceSpectrum.py \
-  ./LinearProbe2/PlanarReflector1
+#python ${script_dir}/ApplyPyToFolder.py \
+  #--glob '*[12][05]_freq_000[75][05]00000_*.nrrd' \
+  #${script_dir}/Estimate_USRF_ReferenceSpectrum.py \
+  #./LinearProbe1/PlanarReflector1
+#python ${script_dir}/ApplyPyToFolder.py \
+  #--glob '*[12][05]_freq_000[75][05]00000_*.nrrd' \
+  #${script_dir}/Estimate_USRF_ReferenceSpectrum.py \
+  #./LinearProbe2/PlanarReflector1
