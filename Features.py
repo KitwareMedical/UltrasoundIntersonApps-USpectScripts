@@ -8,7 +8,7 @@ class SpectralFeatures:
     
     #def __init__(self):
 
-    def loadFromFolder( self, featureFolder, labelImage, windowSize = 128 ):
+    def loadFromFolder( self, featureFolder, labelImageFile, windowSize = 128 ):
         self.featureNames = []
         self.features = []
         for fname in listdir( featureFolder ):
@@ -21,22 +21,12 @@ class SpectralFeatures:
              
         
         
-        imageType = itk.Image[itk.UC, 3]
+        imageType = itk.Image[itk.UC, 2]
         reader = itk.ImageFileReader[imageType].New()
-        reader.SetFileName( labelImage )
+        reader.SetFileName( labelImageFile )
         reader.Update()
-
-        labelImage = itk.GetArrayFromImage( reader.GetOutput() ).squeeze()
-    
-        self.labels = np.zeros( self.features[0].shape[0:2] )
-        index = 0
-        step = int( labelImage.shape[1] / self.features[0].shape[1] ) 
-        for i in range(0, labelImage.shape[1], step ):
-            start = int( max( 0, i-windowSize/2) )
-            end = int(min( labelImage.shape[1]-1, i+windowSize/2) )
-            self.labels[:, index] = np.amin( labelImage[:, range(start, end)], 1 )
-            index = index + 1
-
+        self.labels = itk.GetArrayFromImage( reader.GetOutput() );
+        print(self.labels.shape) 
 
     def toPandas(self):
         df = {}
@@ -45,6 +35,7 @@ class SpectralFeatures:
                 df[ self.featureNames[i] + "-coeff-" + str(j) ] = self.features[i][:,:, j].flatten() 
                 
         df["label"] = self.labels.flatten()
+        print( np.max( df["label"]) )
         return pd.DataFrame(df)
 
 def main():
@@ -54,7 +45,7 @@ def main():
     dfs = []
     for f in trainFolders:
        ff =  path.join( basePath, f)
-       labelFile =  glob.glob( path.join( ff, 'ManualLabels') + '/*ManualLabel.mha' )[0]
+       labelFile =  glob.glob( path.join( ff, 'ManualLabels') + '/*ManualLabel-reduced.mha' )[0]
        featureFolder = path.join(ff, 'SpectraIteration1Features' )
        features = SpectralFeatures()
        features.loadFromFolder( featureFolder, labelFile )

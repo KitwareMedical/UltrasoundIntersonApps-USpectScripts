@@ -115,6 +115,9 @@ def main():
     trainPatches = np.concatenate( trainPatches, axis=0 )
     trainLabels  = np.concatenate( trainLabels,  axis=0 )
 
+    trainPatches = trainPatches[ trainLabels > 0, ... ]
+    trainLabels = trainLabels[ trainLabels > 0 ]
+
     print( trainPatches.shape )
     print( trainLabels.shape )
 
@@ -130,7 +133,10 @@ def main():
        testLabels.append( patchGenerator.getLabels() )
     testPatches = np.concatenate( testPatches, axis=0 )
     testLabels  = np.concatenate( testLabels,  axis=0 )
-   
+    
+    testPatches = testPatches[ testLabels > 0, ... ]
+    testLabels = testLabels[ testLabels > 0 ]
+
     print( "Neural net of all features 2D conv with channels" )
     fitNeuralNet2D( trainPatches, trainLabels, testPatches, testLabels)
 
