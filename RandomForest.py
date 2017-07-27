@@ -52,7 +52,7 @@ def main():
     dfs = []
     for f in trainFolders:
        ff =  path.join( basePath, f)
-       labelFile =  glob.glob( path.join( ff, 'ManualLabels') + '/*ManualLabel.mha' )[0]
+       labelFile =  glob.glob( path.join( ff, 'ManualLabels') + '/*ManualLabel-reduced.mha' )[0]
        featureFolder = path.join(ff, 'SpectraIteration1Features' )
        features = Features.SpectralFeatures()
        features.loadFromFolder( featureFolder, labelFile )
@@ -63,7 +63,7 @@ def main():
     dfs = []
     for f in testFolders:
        ff =  path.join( basePath, f)
-       labelFile =  glob.glob( path.join( ff, 'ManualLabels') + '/*ManualLabel.mha' )[0]
+       labelFile =  glob.glob( path.join( ff, 'ManualLabels') + '/*ManualLabel-reduced.mha' )[0]
        featureFolder = path.join(ff, 'SpectraIteration1Features' )
        features = Features.SpectralFeatures()
        features.loadFromFolder( featureFolder, labelFile )
@@ -77,7 +77,8 @@ def main():
 
     #All features
     le = preprocessing.LabelEncoder()
-    le.fit(traindf['label']) 
+    le.fit(traindf['label'])
+    print( le.classes_ )
    
     fitForest("All Features", [], le, traindf, testdf)
     

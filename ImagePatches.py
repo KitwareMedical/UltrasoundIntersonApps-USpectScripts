@@ -11,7 +11,7 @@ class ImagePatchGenerator:
     def loadFromFolder( self, folder, labelImage, patch_size = (23, 23), step_size = 4 ):
         self.featureNames = []
         self.features = []
-        for fname in glob.glob( folder + "/*.nrrd" ):
+        for fname in glob.glob( folder + "/BMode/*.mha" ):
             fsplit = fname.split('_');
             name = "image-" + fsplit[2] + "-" + fsplit[4]
             self.featureNames.append( name )
