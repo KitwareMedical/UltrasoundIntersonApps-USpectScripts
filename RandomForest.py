@@ -46,7 +46,11 @@ def fitForest(name, featureNames, labelEncoder, traindf, testdf):
 
 
 def main():
-    basePath = '/home/samuel/Projects/Ultrasound/Spectroscopy/Data/LinearProbe1/'
+    parser = argparse.ArgumentParser(description='Run Neural Net')
+    parser.add_argument('basepath', help="Path to data directory")
+    args = parse.parse_args();
+
+    basePath = args.basepath
     trainFolders = [ 'Chicken1', 'Chicken2', 'Steak1', 'Steak2', 'Pork1', 'Pork2' ]
     
     dfs = []

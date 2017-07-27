@@ -48,6 +48,8 @@ def fitNeuralNet3D( trainPatches, trainLabels, testPatches, testLabels  ):
     acc = metrics.accuracy_score( testLabels, test_pred )
     print("multilabel subset accuracy: " + str(acc) )
 
+    return ( score, acc )
+
 
 def fitNeuralNet2D( trainPatches, trainLabels, testPatches, testLabels  ):
 
@@ -98,8 +100,12 @@ def fitNeuralNet2D( trainPatches, trainLabels, testPatches, testLabels  ):
 
 
 def main():
-    basePath = '/home/samuel/Projects/Ultrasound/Spectroscopy/Data/LinearProbe1/'
-    
+    parser = argparse.ArgumentParser(description='Run Neural Net')
+    parser.add_argument('basepath', help="Path to data directory")
+    args = parse.parse_args();
+
+    basePath = args.basepath 
+
     trainFolders = [ 'Chicken1', 'Chicken2', 'Steak1', 'Steak2', 'Pork1', 'Pork2' ]
     trainPatches = []
     trainLabels  = []
@@ -118,6 +124,7 @@ def main():
     trainPatches = trainPatches[ trainLabels > 0, ... ]
     trainLabels = trainLabels[ trainLabels > 0 ]
 
+   
     print( trainPatches.shape )
     print( trainLabels.shape )
 
@@ -137,16 +144,31 @@ def main():
     testPatches = testPatches[ testLabels > 0, ... ]
     testLabels = testLabels[ testLabels > 0 ]
 
-    print( "Neural net of all features 2D conv with channels" )
-    fitNeuralNet2D( trainPatches, trainLabels, testPatches, testLabels)
+    results = []
 
-    print( "Neural net on feature " + featureNames[0] )
-    fitNeuralNet2D( trainPatches[...,0][...,np.newaxis], trainLabels, testPatches[...,0][...,np.newaxis], testLabels)
+    print( "Neural net of all features 2D conv with channels" )
+    res = fitNeuralNet2D( trainPatches, trainLabels, testPatches, testLabels)
+    results.append( res )
+    print("")
+    print("")
+
+    for i in range( len(featureNames) ):
+      print( "Neural net on feature " + featureNames[i] )
+      res = fitNeuralNet2D( trainPatches[...,i][...,np.newaxis], trainLabels, testPatches[...,i][...,np.newaxis], testLabels)
+      results.append( res )
+      print("")
+      print("")
   
     print( "Neural net of all features 3D" )
-    fitNeuralNet3D( trainPatches[...,np.newaxis], trainLabels, testPatches[...,np.newaxis], testLabels)
+    res = fitNeuralNet3D( trainPatches[...,np.newaxis], trainLabels, testPatches[...,np.newaxis], testLabels)
+    results.append( res )
+    print("")
+    print("")
 
   
+    for res in results:
+      print( res )
+
 
 if __name__ == '__main__':
     main()
