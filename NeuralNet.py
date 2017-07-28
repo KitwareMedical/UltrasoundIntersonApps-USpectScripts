@@ -124,8 +124,8 @@ def load_data( basePath, folders ):
     data = np.concatenate( data, axis=0 )
     labels  = np.concatenate( labels,  axis=0 )
 
-    data = trainPatches[ labels > 0, ... ]
-    labels = trainLabels[ labels > 0 ]
+    data = data[ labels > 0, ... ]
+    labels = labels[ labels > 0 ]
     return (data, labels, featureNames)
 
 
