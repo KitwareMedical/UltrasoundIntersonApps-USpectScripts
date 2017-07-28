@@ -47,16 +47,11 @@ def fitNeuralNet3D( trainPatches, trainLabels, testPatches, testLabels  ):
     score = model.evaluate( testPatches, testLabels, batch_size = 32 )
     print("")
     print("Test results:")
-    for i in range(len( model.metrics_names)):
-        print( model.metrics_names[i] + ": " + str(score[i]) )
+    for i in range(len( score) ):
+        print( score[i] )
   
-    
-    
-    test_pred = to_categorical( test_pred, num_classes = testLabels.shape[1])
-    acc = metrics.accuracy_score( testLabels, test_pred )
-    print("multilabel subset accuracy: " + str(acc) )
-
-    return [ score, acc, history ]
+    score.append(hist)
+    return  score
 
 
 def fitNeuralNet2D( trainPatches, trainLabels, testPatches, testLabels  ):
@@ -100,12 +95,13 @@ def fitNeuralNet2D( trainPatches, trainLabels, testPatches, testLabels  ):
     for i in range(len( model.metrics_names)):
         print( model.metrics_names[i] + ": " + str(score[i]) )
     
-    test_pred = to_categorical( test_pred, num_classes = testLabels.shape[1])
-    acc = metrics.accuracy_score( testLabels, test_pred )
-    print("multilabel subset accuracy: " + str(acc) )
+    print("Test results:")
+    for i in range(len( score) ):
+        print( score[i] )
+  
+    score.append(hist)
 
-
-    return [ score, acc, history ]
+    return  score
 
 
 
