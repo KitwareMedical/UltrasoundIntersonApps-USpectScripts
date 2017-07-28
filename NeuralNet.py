@@ -50,7 +50,7 @@ def fitNeuralNet3D( trainPatches, trainLabels, testPatches, testLabels  ):
     for i in range(len( score) ):
         print( score[i] )
   
-    score.append(hist)
+    score.append(history)
     return  score
 
 
@@ -99,7 +99,7 @@ def fitNeuralNet2D( trainPatches, trainLabels, testPatches, testLabels  ):
     for i in range(len( score) ):
         print( score[i] )
   
-    score.append(hist)
+    score.append(history)
 
     return  score
 
