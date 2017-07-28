@@ -156,23 +156,23 @@ def main():
 
     print( "Neural net of all features 2D conv with channels" )
     res = fitNeuralNet2D( trainPatches, trainLabels, testPatches, testLabels)
-    res.append("All 2D")
+    res.append("All-2D")
     results.append( res )
     print("")
     print("")
 
     for i in range( len(featureNames) ):
       print( "Neural net on feature " + featureNames[i] )
-      #res = fitNeuralNet2D( trainPatches[...,i][...,np.newaxis], trainLabels, testPatches[...,i][...,np.newaxis], testLabels)
-      #res.append( featureName[i] )
-      #results.append( res )
+      res = fitNeuralNet2D( trainPatches[...,i][...,np.newaxis], trainLabels, testPatches[...,i][...,np.newaxis], testLabels)
+      res.append( featureNames[i] )
+      results.append( res )
       print("")
       print("")
   
     print( "Neural net of all features 3D" )
-    #res = fitNeuralNet3D( trainPatches[...,np.newaxis], trainLabels, testPatches[...,np.newaxis], testLabels)
-    #res.append("All 3D")
-    #results.append( res )
+    res = fitNeuralNet3D( trainPatches[...,np.newaxis], trainLabels, testPatches[...,np.newaxis], testLabels)
+    res.append("All-3D")
+    results.append( res )
     print("")
     print("")
 
@@ -187,7 +187,8 @@ def main():
       plt.xlabel('epoch')
       plt.legend(['train', 'test'], loc='upper left')
       plt.savefig( 'model-accuracy_' + res[3]  + '.png'  )
-     
+      plt.close()
+
       plt.plot(history.history['loss'])
       plt.plot(history.history['val_loss'])
       plt.title('model loss ' + res[3] )
@@ -195,6 +196,7 @@ def main():
       plt.xlabel('epoch')
       plt.legend(['train', 'test'], loc='upper left')
       plt.savefig( 'model-loss_' + res[3]  + '.png'  )
+      plt.close()
 
 if __name__ == '__main__':
     main()
