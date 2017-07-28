@@ -73,11 +73,11 @@ def fitNeuralNet2D( trainPatches, trainLabels,
     print( trainPatches.shape[1:4] )
     model = Sequential()
     model.add( Conv2D(12, (3,3), activation='relu', input_shape = trainPatches.shape[1:4]) ) 
-    model.add( MaxPooling2D( (2,2) ) )
+    model.add( MaxPooling2D( (1,4) ) )
     model.add( Conv2D(24, (3,3), activation='relu') )
-    model.add( MaxPooling2D( (2,2) ) )
+    model.add( MaxPooling2D( (1,4) ) )
     model.add( Conv2D(48, (3,3), activation='relu') )
-    model.add( MaxPooling2D( (2,2) ) )
+    #model.add( MaxPooling2D( (2,2) ) )
     model.add( Flatten() )
     model.add( Dense(trainLabels.shape[1] * 2, activation="sigmoid" ) )
     model.add( Dense(trainLabels.shape[1], activation="softmax") )
@@ -109,7 +109,7 @@ def fitNeuralNet2D( trainPatches, trainLabels,
 
 
 
-def load_data( basePath, folders ):
+def load_data( basePath, folders, patch_size = (7, 63) ):
     data = []
     labels  = []
     featureNames = []
@@ -117,7 +117,7 @@ def load_data( basePath, folders ):
        folder =  path.join( basePath, f)
        labelFile =  glob.glob( path.join( folder, 'ManualLabels') + '/*ManualLabel.mha' )[0]
        patchGenerator = ImagePatches.ImagePatchGenerator()
-       patchGenerator.loadFromFolder( folder, labelFile )
+       patchGenerator.loadFromFolder( folder, labelFile, patch_size )
        featureNames, patches = patchGenerator.getPatches()
        data.append( patches )
        labels.append( patchGenerator.getLabels() )
@@ -136,7 +136,7 @@ def main():
 
     basePath = args.basepath 
 
-    trainFolders = [ 'Chicken1', 'Chicken2', 'Steak1', 'Steak2', 'Pork1', 'Pork2']
+    trainFolders = [ 'Chicken1', 'Steak1', 'Pork1', 'Chicken2', 'Steak2', 'Pork2']
     validationFolders = [ 'Chicken3', 'Steak3', 'Pork3' ]
     testFolders = [ 'Chicken4', 'Steak4', 'Pork4' ]
 
