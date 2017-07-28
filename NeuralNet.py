@@ -89,9 +89,9 @@ def fitNeuralNet2D( trainPatches, trainLabels, testPatches, testLabels  ):
     model.summary()
     weights = np.sum(trainLabels, axis=0)
     print(weights)
-    model.fit( trainPatches, trainLabels, validation = 0.4, 
-               validation_split = 0.3, batch_size = 64, epochs = 10, 
-               class_weight = weights, callbacks=[history]  )
+    model.fit( trainPatches, trainLabels, validation_split = 0.3, 
+               batch_size = 64, epochs = 10, class_weight = weights, 
+               callbacks=[history]  )
     
     test_pred = model.predict_classes( testPatches )
     score = model.evaluate( testPatches, testLabels, batch_size = 64 )
