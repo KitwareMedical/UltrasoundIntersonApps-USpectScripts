@@ -18,13 +18,14 @@ def fitNeuralNet3D( trainPatches, trainLabels,
                     testPatches, testLabels  ):
 
     history = History()
-    
+        
     trainLabels = np.unique( trainLabels, return_inverse=True )[1]
-    trainLabels = to_categorical( trainLabels )
-    
+    validationLabels = np.unique( validationLabels, return_inverse=True )[1]
     testLabels  = np.unique( testLabels, return_inverse=True )[1]
+    trainLabels = to_categorical( trainLabels )
+    validationLabels = to_categorical( validationLabels )
     testLabels  = to_categorical( testLabels )
-  
+
     print( trainPatches.shape[1:4] )
     model = Sequential()
     model.add( Conv3D(8, (3,3,3), activation='relu', input_shape = trainPatches.shape[1:4] +(1,) ) ) 
@@ -62,12 +63,11 @@ def fitNeuralNet2D( trainPatches, trainLabels,
 
     history = History()
     
-    print( trainLabels.shape )
-    print( testLabels.shape )
     trainLabels = np.unique( trainLabels, return_inverse=True )[1]
+    validationLabels = np.unique( validationLabels, return_inverse=True )[1]
     testLabels  = np.unique( testLabels, return_inverse=True )[1]
     trainLabels = to_categorical( trainLabels )
-    print( trainLabels.shape )
+    validationLabels = to_categorical( validationLabels )
     testLabels  = to_categorical( testLabels )
   
     print( trainPatches.shape[1:4] )
