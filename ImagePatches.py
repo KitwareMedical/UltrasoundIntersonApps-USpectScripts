@@ -6,9 +6,11 @@ from skimage import util
 
 class ImagePatchGenerator:
     
-    #def __init__(self):
+    def __init__(self, patch_size = (23, 23), step_size = 4 ):
+        self.patch_size = patch_size
+        self.step_size = step_size
 
-    def loadFromFolder( self, folder, labelImage, patch_size = (23, 23), step_size = 4 ):
+    def loadFromFolder( self, folder, labelImage ):
         self.featureNames = []
         self.features = []
         for fname in glob.glob( folder + "/BMode/*.mha" ):
@@ -20,16 +22,22 @@ class ImagePatchGenerator:
             reader = itk.ImageFileReader[imageType].New()
             reader.SetFileName( fname )
             reader.Update()
-            image = itk.GetArrayFromImage( reader.GetOutput() ).squeeze()
+            image = itk.GetArrayViewFromImage( reader.GetOutput() ).squeeze()
             image = image -  np.min(image)
             image = image  / np.max(image)
-            patches = util.view_as_windows(  image, patch_size, step_size )
+            patches = util.view_as_windows(  image, self.patch_size, self.step_size )
             patch_shape = ( patches.shape[0]*patches.shape[1], patches.shape[2], patches.shape[3])
             patches = np.reshape( patches, patch_shape, 'F' )
-            print(patches.shape)
             self.features.append( patches )
         
-            print( patches.shape )
+ 
+        self.indexX = np.transpose(
+                      np.repeat( [np.arange(image.shape[0])], 
+                                   image.shape[1], axis=0 ) )
+        self.indexY = np.repeat( [np.arange(image.shape[1])], 
+                                     image.shape[0], axis=0 ) 
+
+        self.image_shape = image.shape
 
         self.features = np.stack(self.features, axis=-1)  
         
@@ -39,10 +47,8 @@ class ImagePatchGenerator:
         reader.SetFileName( labelImage )
         reader.Update()
 
-        labelImage = itk.GetArrayFromImage( reader.GetOutput() ).squeeze() 
-        print("label: ")
-        print( labelImage.shape )
-        patches = util.view_as_windows(  labelImage, patch_size, step_size )
+        labelImage = itk.GetArrayViewFromImage( reader.GetOutput() ).squeeze() 
+        patches = util.view_as_windows(  labelImage, self.patch_size, self.step_size )
         patch_shape = ( patches.shape[0]*patches.shape[1], patches.shape[2], patches.shape[3])
         patches = np.reshape( patches, patch_shape, 'F' )
         self.labels = np.zeros( patches.shape[0]  )
@@ -51,6 +57,30 @@ class ImagePatchGenerator:
             c = np.argmax( np.bincount(b) )
             self.labels[i] = a[c]
 
+
+    def getPatchIndexX(self):
+        print( self.indexX.shape )
+        patchesX = util.view_as_windows( np.ascontiguousarray( self.indexX ), 
+                                         self.patch_size, self.step_size )
+        patch_shape = ( patchesX.shape[0]*patchesX.shape[1], patchesX.shape[2], patchesX.shape[3])
+        patchesX = np.reshape( patchesX, patch_shape, 'F' )
+        return patchesX
+
+    def getPatchIndexY(self):
+        patchesY = util.view_as_windows(  np.ascontiguousarray( self.indexY ), 
+                                          self.patch_size, self.step_size )
+        patch_shape = ( patchesY.shape[0]*patchesY.shape[1], patchesY.shape[2], patchesY.shape[3])
+        patchesY = np.reshape( patchesY, patch_shape, 'F' )
+        return patchesY
+
+    def getImageShape(self):
+        return self.indexX.shape
+
+    def getPatches(self):
+        return (self.featureNames, self.features)
+
+    def getLabels(self):
+        return self.labels
 
     def getPatches(self):
         return (self.featureNames, self.features)
@@ -70,6 +100,9 @@ def main():
        patchGenerator.loadFromFolder( folder, labelFile )
 
     pass
+
+
+
 
 if __name__ == '__main__':
     main()
