@@ -13,7 +13,9 @@ from keras.callbacks import History
 
 import matplotlib.pyplot as plt
 
-def fitNeuralNet3D( trainPatches, trainLabels, testPatches, testLabels  ):
+def fitNeuralNet3D( trainPatches, trainLabels, 
+                    validationPatches, validationLabels, 
+                    testPatches, testLabels  ):
 
     history = History()
     
@@ -40,9 +42,9 @@ def fitNeuralNet3D( trainPatches, trainLabels, testPatches, testLabels  ):
 
     weights = np.sum(trainLabels, axis=0)
     print(weights)
-    model.fit( trainPatches, trainLabels, validation_split = 0.3, 
+    model.fit( trainPatches, trainLabels, validation_split = 0.0, 
                batch_size = 64, epochs = 10, class_weight = weights, 
-               callbacks=[history] )    
+               callbacks=[history], validation_data = (validationPatches, validationLabels) )    
     test_pred = model.predict_classes( testPatches )
     score = model.evaluate( testPatches, testLabels, batch_size = 32 )
     print("")
@@ -54,7 +56,9 @@ def fitNeuralNet3D( trainPatches, trainLabels, testPatches, testLabels  ):
     return  score
 
 
-def fitNeuralNet2D( trainPatches, trainLabels, testPatches, testLabels  ):
+def fitNeuralNet2D( trainPatches, trainLabels, 
+                    validationPatches, validationLabels, 
+                    testPatches, testLabels  ):
 
     history = History()
     
@@ -78,15 +82,15 @@ def fitNeuralNet2D( trainPatches, trainLabels, testPatches, testLabels  ):
     model.add( Dense(trainLabels.shape[1] * 2, activation="sigmoid" ) )
     model.add( Dense(trainLabels.shape[1], activation="softmax") )
     
-    sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.66, nesterov=True)
     model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
     
     model.summary()
     weights = np.sum(trainLabels, axis=0)
     print(weights)
-    model.fit( trainPatches, trainLabels, validation_split = 0.3, 
+    model.fit( trainPatches, trainLabels, validation_split = 0.0, 
                batch_size = 64, epochs = 10, class_weight = weights, 
-               callbacks=[history]  )
+               callbacks=[history], validation_data = (validationPatches, validationLabels)  )
     
     test_pred = model.predict_classes( testPatches )
     score = model.evaluate( testPatches, testLabels, batch_size = 64 )
@@ -105,6 +109,24 @@ def fitNeuralNet2D( trainPatches, trainLabels, testPatches, testLabels  ):
 
 
 
+def load_data( basePath, folders ):
+    data = []
+    labels  = []
+    featureNames = []
+    for f in folders:
+       folder =  path.join( basePath, f)
+       labelFile =  glob.glob( path.join( folder, 'ManualLabels') + '/*ManualLabel.mha' )[0]
+       patchGenerator = ImagePatches.ImagePatchGenerator()
+       patchGenerator.loadFromFolder( folder, labelFile )
+       featureNames, patches = patchGenerator.getPatches()
+       data.append( patches )
+       labels.append( patchGenerator.getLabels() )
+    data = np.concatenate( data, axis=0 )
+    labels  = np.concatenate( labels,  axis=0 )
+
+    data = trainPatches[ labels > 0, ... ]
+    labels = trainLabels[ labels > 0 ]
+    return (data, labels, featureNames)
 
 
 def main():
@@ -114,48 +136,26 @@ def main():
 
     basePath = args.basepath 
 
-    trainFolders = [ 'Chicken1', 'Chicken2', 'Chicken3', 'Steak1', 'Steak2', 'Steak3', 'Pork1', 'Pork2', 'Pork3' ]
-    trainPatches = []
-    trainLabels  = []
-    featureNames = []
-    for f in trainFolders:
-       folder =  path.join( basePath, f)
-       labelFile =  glob.glob( path.join( folder, 'ManualLabels') + '/*ManualLabel.mha' )[0]
-       patchGenerator = ImagePatches.ImagePatchGenerator()
-       patchGenerator.loadFromFolder( folder, labelFile )
-       featureNames, patches = patchGenerator.getPatches()
-       trainPatches.append( patches )
-       trainLabels.append( patchGenerator.getLabels() )
-    trainPatches = np.concatenate( trainPatches, axis=0 )
-    trainLabels  = np.concatenate( trainLabels,  axis=0 )
+    trainFolders = [ 'Chicken1', 'Chicken2', 'Steak1', 'Steak2', 'Pork1', 'Pork2']
+    validationFolders = [ 'Chicken3', 'Steak3', 'Pork3' ]
+    testFolders = [ 'Chicken4', 'Steak4', 'Pork4' ]
 
-    trainPatches = trainPatches[ trainLabels > 0, ... ]
-    trainLabels = trainLabels[ trainLabels > 0 ]
+
+    (trainPatches, trainLabels, featureNames) = load_data(basePath, trainFolders)
+    (validationPatches, validationLabels, featureNames) = load_data(basePath, validationFolders)
+    (testPatches, testLabels, featureNames) = load_data(basePath, testFolders)
 
    
     print( trainPatches.shape )
     print( trainLabels.shape )
 
-    testFolders = [ 'Chicken4', 'Steak4', 'Pork4' ]
-    testPatches = []
-    testLabels  = []
-    for f in testFolders:
-       folder =  path.join( basePath, f)
-       labelFile =  glob.glob( path.join( folder, 'ManualLabels') + '/*ManualLabel.mha' )[0]
-       patchGenerator = ImagePatches.ImagePatchGenerator()
-       patchGenerator.loadFromFolder( folder, labelFile )
-       testPatches.append( patchGenerator.getPatches()[1] )
-       testLabels.append( patchGenerator.getLabels() )
-    testPatches = np.concatenate( testPatches, axis=0 )
-    testLabels  = np.concatenate( testLabels,  axis=0 )
-    
-    testPatches = testPatches[ testLabels > 0, ... ]
-    testLabels = testLabels[ testLabels > 0 ]
 
     results = []
 
     print( "Neural net of all features 2D conv with channels" )
-    res = fitNeuralNet2D( trainPatches, trainLabels, testPatches, testLabels)
+    res = fitNeuralNet2D( trainPatches, trainLabels, 
+                          validationPatches, validationLabels, 
+                          testPatches, testLabels)
     res.append("All-2D")
     results.append( res )
     print("")
@@ -163,14 +163,18 @@ def main():
 
     for i in range( len(featureNames) ):
       print( "Neural net on feature " + featureNames[i] )
-      res = fitNeuralNet2D( trainPatches[...,i][...,np.newaxis], trainLabels, testPatches[...,i][...,np.newaxis], testLabels)
+      res = fitNeuralNet2D( trainPatches[...,i][...,np.newaxis], trainLabels, 
+                            validationPatches[...,i][...,np.newaxis], validationLabels, 
+                            testPatches[...,i][...,np.newaxis], testLabels)
       res.append( featureNames[i] )
       results.append( res )
       print("")
       print("")
   
     print( "Neural net of all features 3D" )
-    res = fitNeuralNet3D( trainPatches[...,np.newaxis], trainLabels, testPatches[...,np.newaxis], testLabels)
+    res = fitNeuralNet3D( trainPatches[...,np.newaxis], trainLabels,
+                          validationPatches[...,np.newaxis], validationLabels, 
+                          testPatches[...,np.newaxis], testLabels)
     res.append("All-3D")
     results.append( res )
     print("")
