@@ -6,6 +6,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn import preprocessing
 import Features
 import glob
+import argparse
 
 
 def fitForest(name, featureNames, labelEncoder, traindf, testdf):
@@ -48,7 +49,7 @@ def fitForest(name, featureNames, labelEncoder, traindf, testdf):
 def main():
     parser = argparse.ArgumentParser(description='Run Neural Net')
     parser.add_argument('basepath', help="Path to data directory")
-    args = parse.parse_args();
+    args = parser.parse_args();
 
     basePath = args.basepath
     trainFolders = [ 'Chicken1', 'Chicken2', 'Steak1', 'Steak2', 'Pork1', 'Pork2' ]

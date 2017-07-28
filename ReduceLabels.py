@@ -1,10 +1,11 @@
 import os
+import argparse
 import glob
 
 parser = argparse.ArgumentParser(description='Run Neural Net')
 parser.add_argument('basepath', help="Path to data directory")
 parser.add_argument('exepath', help="Path ReduceLabelImage executable")
-args = parse.parse_args();
+args = parser.parse_args();
 
 folders = os.listdir( args.basePath);
 
