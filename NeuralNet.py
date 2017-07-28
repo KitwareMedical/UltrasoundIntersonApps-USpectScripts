@@ -56,7 +56,7 @@ def fitNeuralNet3D( trainPatches, trainLabels, testPatches, testLabels  ):
     acc = metrics.accuracy_score( testLabels, test_pred )
     print("multilabel subset accuracy: " + str(acc) )
 
-    return ( score, acc, history )
+    return [ score, acc, history ]
 
 
 def fitNeuralNet2D( trainPatches, trainLabels, testPatches, testLabels  ):
@@ -105,7 +105,7 @@ def fitNeuralNet2D( trainPatches, trainLabels, testPatches, testLabels  ):
     print("multilabel subset accuracy: " + str(acc) )
 
 
-    return ( score, acc, history )
+    return [ score, acc, history ]
 
 
 
@@ -167,16 +167,16 @@ def main():
 
     for i in range( len(featureNames) ):
       print( "Neural net on feature " + featureNames[i] )
-      res = fitNeuralNet2D( trainPatches[...,i][...,np.newaxis], trainLabels, testPatches[...,i][...,np.newaxis], testLabels)
-      res.append( featureName[i] )
-      results.append( res )
+      #res = fitNeuralNet2D( trainPatches[...,i][...,np.newaxis], trainLabels, testPatches[...,i][...,np.newaxis], testLabels)
+      #res.append( featureName[i] )
+      #results.append( res )
       print("")
       print("")
   
     print( "Neural net of all features 3D" )
-    res = fitNeuralNet3D( trainPatches[...,np.newaxis], trainLabels, testPatches[...,np.newaxis], testLabels)
-    res.append("All 3D")
-    results.append( res )
+    #res = fitNeuralNet3D( trainPatches[...,np.newaxis], trainLabels, testPatches[...,np.newaxis], testLabels)
+    #res.append("All 3D")
+    #results.append( res )
     print("")
     print("")
 
