@@ -69,10 +69,11 @@ LinearProbe1DataSets=(
 
 for dataset in ${LinearProbe1DataSets[@]}; do
   python ${script_dir}/ApplyPyToFolder.py \
-    --glob "*Spectra*.mha" \
-    ${script_dir}/Analyze_USRF_Spectra.py \
-    ./LinearProbe1/${dataset}/SpectraIteration1/ \
-    '../SpectraIteration1Features'
+    --glob "*ManualLabel.mha" \
+    ${script_dir}/Resample_Labels.py \
+    ./LinearProbe1/${dataset}/ManualLabels/ \
+    '../SpectraIteration1' \
+    '../ManualLabelsResampled'
   echo ''
 done
 
