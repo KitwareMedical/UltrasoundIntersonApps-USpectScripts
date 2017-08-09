@@ -4,10 +4,6 @@ set -x -e
 
 script_dir=$(cd $(dirname $0) || exit 1; pwd)
 
-#python ./ApplyPyToFolder.py ./Convert_USRF_Spectra.py ./2016-09-09-MeatPhantom/${1}
-#python ./ApplyPyToFolder.py ./Analyze_USRF_Spectra.py ./2016-09-09-MeatPhantom/${1} ./2016-09-09-MeatPhantom/Baseline
-
-
 #python ./ApplyPyToFolder.py ./Convert_USRF_BMode.py ~/data/2017.05.31-FourProbes-PlanarNormalization-Meat-Liver/
 
 glob='*[12][05]_freq_000[75][05]00000_*.nrrd'
@@ -62,6 +58,15 @@ LinearProbe1DataSets=(
   #echo ''
 #done
 
+#for dataset in ${LinearProbe1DataSets[@]}; do
+  #python ${script_dir}/ApplyPyToFolder.py \
+    #--glob "*Spectra*.mha" \
+    #${script_dir}/Analyze_USRF_Spectra.py \
+    #./LinearProbe1/${dataset}/SpectraIteration1/ \
+    #'../SpectraIteration1Features'
+  #echo ''
+#done
+
 for dataset in ${LinearProbe1DataSets[@]}; do
   python ${script_dir}/ApplyPyToFolder.py \
     --glob "*Spectra*.mha" \
@@ -70,7 +75,6 @@ for dataset in ${LinearProbe1DataSets[@]}; do
     '../SpectraIteration1Features'
   echo ''
 done
-
 
 LinearProbe2DataSets=(
   Chicken1/
