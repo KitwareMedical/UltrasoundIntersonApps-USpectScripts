@@ -1,41 +1,35 @@
-''#!/usr/bin/python
+#!/usr/bin/python
 
-import sys
 import os
 import imp
-import glob
+import fnmatch
+import argparse
 
-def ApplyPyToFolder(script, folder, script_arg=""):
-    print( "Folder = " + folder )
-    print( "Script = " + script )
-    print( "Extra Arg = " + script_arg )
+def ApplyPyToFolder(script, folder, glob='*.nrrd', script_args=None):
+    print("Folder = " + folder)
+    print("Script = " + script)
+    print("Extra Arg = ", script_args)
 
     script_file_dir, script_file_name_ext = os.path.split(script)
     script_module_name, script_file_ext = os.path.splitext(script_file_name_ext)
     script_module = imp.load_source(script_module_name, script)
     script_class = getattr(script_module, script_module_name)
 
-    file_list = glob.glob(folder+'/*.nrrd')
-    i = 0
+    file_list = []
+    for root, dirnames, filenames in os.walk(folder):
+        for filename in fnmatch.filter(filenames, glob):
+            file_list.append(os.path.join(root, filename))
     number_of_files = len(file_list)
-    print( "Number of files = " + str( number_of_files ) )
-    for input_file in file_list:
-        print( "%d of %d: %s" %(i, number_of_files, input_file) )
-        if len(script_arg) == 0:
-            script_class(input_file)
-        else:
-            script_class(input_file, script_arg)
-        i = i + 1
+    print("Number of files = " + str(number_of_files))
+    for i, input_file in enumerate(file_list):
+        print("%d of %d: %s" %(i, number_of_files, input_file))
+        script_class(input_file, *script_args)
 
 if __name__ == '__main__':
-    if len(sys.argv) == 3:
-        script = sys.argv[1]
-        folder = sys.argv[2]
-        ApplyPyToFolder(script, folder)
-    elif len(sys.argv) == 4:
-        script = sys.argv[1]
-        folder = sys.argv[2]
-        script_arg = sys.argv[3]
-        ApplyPyToFolder(script, folder, script_arg)
-    else:
-        print( "ApplyPyToFolder <script> <folder> [extra_script_arg]")
+    parser = argparse.ArgumentParser(description='Apply processing script to files in a folder.')
+    parser.add_argument('script', help='Path to script to run. Should have a function with the same as the script to invoke')
+    parser.add_argument('folder', help='Folder to apply the script to.')
+    parser.add_argument('--glob', help='Glob to find files recursively in the given folder.', default='*.nrrd')
+    parser.add_argument('extra_script_args', nargs='*', help='extra arguments to pass to script function')
+    args = parser.parse_args()
+    ApplyPyToFolder(args.script, args.folder, args.glob, args.extra_script_args)
