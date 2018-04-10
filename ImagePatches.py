@@ -13,21 +13,36 @@ class ImagePatchGenerator:
     def loadFromFolder( self, folder, labelImage ):
         self.featureNames = []
         self.features = []
-        for fname in glob.glob( folder + "/BMode/*.mha" ):
+        #for fname in glob.glob( folder + "/BMode2/rf_voltage_20*.nrrd" ):
+        #for fname in glob.glob( folder + "/rf_voltage_20*.nrrd" ):
+        for fname in glob.glob( folder + "/rf_voltage_20*filtered.nrrd" ):
+            print( fname )
             fsplit = fname.split('_');
-            name = "image-" + fsplit[2] + "-" + fsplit[4]
+            #name = "image-" + fsplit[2] + "-" + fsplit[4]
+            name = "image-" + fsplit[3] + "-" + fsplit[5]
             self.featureNames.append( name )
             
-            imageType = itk.Image[itk.F, 3]
+            imageType = itk.Image[itk.F, 2]
             reader = itk.ImageFileReader[imageType].New()
             reader.SetFileName( fname )
             reader.Update()
+            #itkImage = reader.GetOutput();
+
+            #resampler = itk.ResampleImageFilter[imageType, imageType].New()
+            #resampler.SetInput( itkImage )
+            #size = itk.size(itkImage);
+            #size[1] = 256;
+            #resampler.SetSize( size )
+            #resampler.Update();
+
+
             image = itk.GetArrayViewFromImage( reader.GetOutput() ).squeeze()
-            image = image -  np.min(image)
-            image = image  / np.max(image)
+            #image = image -  np.min(image)
+            #image = image  / np.max(image)
             patches = util.view_as_windows(  image, self.patch_size, self.step_size )
             patch_shape = ( patches.shape[0]*patches.shape[1], patches.shape[2], patches.shape[3])
             patches = np.reshape( patches, patch_shape, 'F' )
+            print( patches.shape )
             self.features.append( patches )
         
  
@@ -46,6 +61,14 @@ class ImagePatchGenerator:
         reader = itk.ImageFileReader[imageType].New()
         reader.SetFileName( labelImage )
         reader.Update()
+        
+        #resampler = itk.ResampleImageFilter[imageType, imageType].New()
+        #resampler.SetInput( reader.GetOutput() )
+        #size = itk.size(itkImage);
+        #size[1] = 256;
+        #resampler.SetSize( size )
+        #resampler.SetInterpolator( itk.NearestNeighborInterpolateImageFunction.New() )
+        #resampler.Update();
 
         labelImage = itk.GetArrayViewFromImage( reader.GetOutput() ).squeeze() 
         patches = util.view_as_windows(  labelImage, self.patch_size, self.step_size )
